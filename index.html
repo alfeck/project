@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+        @keyframes fadeInSlideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up {
+            animation: fadeInSlideUp 0.5s ease-out forwards;
+        }
+        .text-shadow-lg {
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .hidden { display: none; }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .comparison-table th, .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .comparison-table th {
+            background-color: #f3f4f6;
+            font-weight: 600;
+        }
+        .comparison-table tr:hover {
+            background-color: #f9fafb;
+        }
+        .device-select option:disabled {
+            color: #9ca3af;
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-100 text-gray-900">
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-purple-700 to-indigo-800 text-white p-6 shadow-2xl sticky top-0 z-10">
+        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center">
+            <h1 class="text-4xl font-extrabold mb-4 md:mb-0 text-shadow-lg">Device Explorer</h1>
+            <nav class="flex space-x-4">
+                <button id="gamingBtn" class="category-btn py-2 px-4 rounded-full font-semibold transition duration-300 ease-in-out transform hover:scale-105 bg-white text-purple-700 shadow-md" data-category="gaming">Gaming</button>
+                <button id="photographyBtn" class="category-btn py-2 px-4 rounded-full font-semibold transition duration-300 ease-in-out transform hover:scale-105 text-white hover:bg-purple-800" data-category="photography">Photography</button>
+                <button id="allRounderBtn" class="category-btn py-2 px-4 rounded-full font-semibold transition duration-300 ease-in-out transform hover:scale-105 text-white hover:bg-purple-800" data-category="allRounder">All-Rounder</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-8">
+
+        <!-- Gaming Category Section -->
+        <section id="gamingCategory" class="category-section">
+            <div class="p-6 bg-white rounded-lg shadow-lg">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Gaming Phones</h2>
+                <div class="mb-6 p-4 bg-gray-100 rounded-lg border border-gray-200">
+                    <label for="priceFilterGaming" class="block text-gray-700 text-lg font-medium mb-2">Filter by Price Range:</label>
+                    <select id="priceFilterGaming" class="p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full"></select>
+                </div>
+                <div id="gamingDeviceList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"></div>
+                <div class="bg-blue-50 p-6 rounded-lg shadow-inner border border-blue-200">
+                    <h3 class="text-2xl font-bold text-blue-800 mb-4">Compare Gaming Devices</h3>
+                    <div class="mb-4">
+                        <label for="numComparisonsGaming" class="block text-gray-700 text-lg font-medium mb-2">Number of devices to compare:</label>
+                        <select id="numComparisonsGaming" class="p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full md:w-auto">
+                            <option value="2">2 Devices</option>
+                            <option value="3" selected>3 Devices</option>
+                            <option value="4">4 Devices</option>
+                        </select>
+                    </div>
+                    <div id="gamingComparisonDropdowns" class="flex flex-col md:flex-row gap-4 mb-4"></div>
+                    <button id="compareGamingBtn" class="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-md transition duration-300 ease-in-out transform hover:scale-105 shadow-lg">Compare</button>
+                    <div id="gamingComparisonResults" class="mt-8"></div>
+                    <div id="gamingSuggestion" class="mt-6 p-4 bg-blue-100 border border-blue-300 rounded-lg text-blue-800 font-medium whitespace-pre-wrap hidden animate-fade-in-up"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Photography Category Section -->
+        <section id="photographyCategory" class="category-section hidden">
+            <div class="p-6 bg-white rounded-lg shadow-lg">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Photography Phones</h2>
+                <div class="mb-6 p-4 bg-gray-100 rounded-lg border border-gray-200">
+                    <label for="priceFilterPhotography" class="block text-gray-700 text-lg font-medium mb-2">Filter by Price Range:</label>
+                    <select id="priceFilterPhotography" class="p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent w-full"></select>
+                </div>
+                <div id="photographyDeviceList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"></div>
+                <div class="bg-green-50 p-6 rounded-lg shadow-inner border border-green-200">
+                    <h3 class="text-2xl font-bold text-green-800 mb-4">Compare Photography Devices</h3>
+                    <div class="mb-4">
+                        <label for="numComparisonsPhotography" class="block text-gray-700 text-lg font-medium mb-2">Number of devices to compare:</label>
+                        <select id="numComparisonsPhotography" class="p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent w-full md:w-auto">
+                            <option value="2">2 Devices</option>
+                            <option value="3" selected>3 Devices</option>
+                            <option value="4">4 Devices</option>
+                        </select>
+                    </div>
+                    <div id="photographyComparisonDropdowns" class="flex flex-col md:flex-row gap-4 mb-4"></div>
+                    <button id="comparePhotographyBtn" class="w-full bg-green-600 text-white font-bold py-3 px-6 rounded-md transition duration-300 ease-in-out transform hover:scale-105 shadow-lg">Compare</button>
+                    <div id="photographyComparisonResults" class="mt-8"></div>
+                    <div id="photographySuggestion" class="mt-6 p-4 bg-green-100 border border-green-300 rounded-lg text-green-800 font-medium whitespace-pre-wrap hidden animate-fade-in-up"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- All-Rounder Category Section -->
+        <section id="allRounderCategory" class="category-section hidden">
+            <div class="p-6 bg-white rounded-lg shadow-lg">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">All-Rounder Phones</h2>
+                <div class="mb-6 p-4 bg-gray-100 rounded-lg border border-gray-200">
+                    <label for="priceFilterAllRounder" class="block text-gray-700 text-lg font-medium mb-2">Filter by Price Range:</label>
+                    <select id="priceFilterAllRounder" class="p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent w-full"></select>
+                </div>
+                <div id="allRounderDeviceList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"></div>
+                <div class="bg-yellow-50 p-6 rounded-lg shadow-inner border border-yellow-200">
+                    <h3 class="text-2xl font-bold text-yellow-800 mb-4">Compare All-Rounder Devices</h3>
+                    <div class="mb-4">
+                        <label for="numComparisonsAllRounder" class="block text-gray-700 text-lg font-medium mb-2">Number of devices to compare:</label>
+                        <select id="numComparisonsAllRounder" class="p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent w-full md:w-auto">
+                            <option value="2">2 Devices</option>
+                            <option value="3" selected>3 Devices</option>
+                            <option value="4">4 Devices</option>
+                        </select>
+                    </div>
+                    <div id="allRounderComparisonDropdowns" class="flex flex-col md:flex-row gap-4 mb-4"></div>
+                    <button id="compareAllRounderBtn" class="w-full bg-yellow-500 text-white font-bold py-3 px-6 rounded-md transition duration-300 ease-in-out transform hover:scale-105 shadow-lg">Compare</button>
+                    <div id="allRounderComparisonResults" class="mt-8"></div>
+                    <div id="allRounderSuggestion" class="mt-6 p-4 bg-yellow-100 border border-yellow-300 rounded-lg text-yellow-800 font-medium whitespace-pre-wrap hidden animate-fade-in-up"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white p-6 text-center mt-10 shadow-inner">
+        <p>&copy; <span id="currentYear"></span> Device Explorer. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // ==================== DATA ====================
+
+        const gamingDevices = [
+            { id: 'gaming1', name: 'Asus ROG Phone 7', priceRange: '₹65,000 - ₹80,000', imageUrl: 'https://placehold.co/300x200/A78BFA/ffffff?text=ROG+Phone+7', specs: { gamingPerformance: { bgmi_fps: 90, freefire_fps: 120, cod_fps: 90 }, temperature: 40, batteryBackup: 8, antutuScore: 1300000 }, description: 'A high-performance gaming phone with excellent thermal management.' },
+            { id: 'gaming2', name: 'RedMagic 8 Pro', priceRange: '₹50,000 - ₹65,000', imageUrl: 'https://placehold.co/300x200/8B5CF6/ffffff?text=RedMagic+8+Pro', specs: { gamingPerformance: { bgmi_fps: 90, freefire_fps: 120, cod_fps: 85 }, temperature: 42, batteryBackup: 7, antutuScore: 1250000 }, description: 'Great value for money, offering solid gaming performance.' },
+            { id: 'gaming3', name: 'Xiaomi Black Shark 5', priceRange: '₹35,000 - ₹50,000', imageUrl: 'https://placehold.co/300x200/6D28D9/ffffff?text=Black+Shark+5', specs: { gamingPerformance: { bgmi_fps: 60, freefire_fps: 90, cod_fps: 60 }, temperature: 45, batteryBackup: 6, antutuScore: 900000 }, description: 'Compact and capable, suitable for casual gaming.' },
+            { id: 'gaming4', name: 'Lenovo Legion Phone Duel 2', priceRange: '₹80,000 - ₹95,000', imageUrl: 'https://placehold.co/300x200/5B21B6/ffffff?text=Legion+Duel+2', specs: { gamingPerformance: { bgmi_fps: 90, freefire_fps: 144, cod_fps: 90 }, temperature: 38, batteryBackup: 9, antutuScore: 1350000 }, description: 'Top-tier performance with advanced cooling and extended battery life.' },
+            { id: 'gaming5', name: 'OnePlus 11R', priceRange: '₹40,000 - ₹55,000', imageUrl: 'https://placehold.co/300x200/4C1D95/ffffff?text=OnePlus+11R', specs: { gamingPerformance: { bgmi_fps: 60, freefire_fps: 90, cod_fps: 60 }, temperature: 41, batteryBackup: 7.5, antutuScore: 1100000 }, description: 'Balanced performance for gaming and daily use.' },
+            { id: 'gaming6', name: 'Samsung Galaxy S23 FE', priceRange: '₹50,000 - ₹65,000', imageUrl: 'https://placehold.co/300x200/3B0764/ffffff?text=Samsung+S23+FE', specs: { gamingPerformance: { bgmi_fps: 60, freefire_fps: 120, cod_fps: 60 }, temperature: 43, batteryBackup: 6.5, antutuScore: 1050000 }, description: 'Flagship experience with good gaming capabilities.' },
+            { id: 'gaming7', name: 'iPhone 15 Pro Max', priceRange: '₹1,20,000 - ₹1,40,000', imageUrl: 'https://placehold.co/300x200/2E005E/ffffff?text=iPhone+15+Pro', specs: { gamingPerformance: { bgmi_fps: 90, freefire_fps: 120, cod_fps: 120 }, temperature: 39, batteryBackup: 8, antutuScore: 1450000 }, description: 'Unmatched optimization for a super smooth gaming experience.' },
+            { id: 'gaming8', name: 'Samsung Galaxy S24 Ultra', priceRange: '₹95,000 - ₹1,10,000', imageUrl: 'https://placehold.co/300x200/240047/ffffff?text=S24+Ultra', specs: { gamingPerformance: { bgmi_fps: 90, freefire_fps: 120, cod_fps: 100 }, temperature: 40, batteryBackup: 8.5, antutuScore: 1400000 }, description: 'Top-tier Android gaming with a stunning display and great cooling.' },
+            { id: 'gaming9', name: 'POCO F6', priceRange: '₹25,000 - ₹35,000', imageUrl: 'https://placehold.co/300x200/1C0033/ffffff?text=POCO+F6', specs: { gamingPerformance: { bgmi_fps: 90, freefire_fps: 90, cod_fps: 60 }, temperature: 44, batteryBackup: 7, antutuScore: 1200000 }, description: 'The undisputed performance champion in the mid-range segment.' },
+            { id: 'gaming10', name: 'iQOO Neo 9 Pro', priceRange: '₹35,000 - ₹45,000', imageUrl: 'https://placehold.co/300x200/140024/ffffff?text=iQOO+Neo+9+Pro', specs: { gamingPerformance: { bgmi_fps: 90, freefire_fps: 120, cod_fps: 80 }, temperature: 41, batteryBackup: 7.5, antutuScore: 1300000 }, description: 'A dedicated gaming phone that offers incredible value for its price.' },
+            { id: 'gaming11', name: 'Nothing Phone (2)', priceRange: '₹38,000 - ₹50,000', imageUrl: 'https://placehold.co/300x200/0A0014/ffffff?text=Nothing+Phone+(2)', specs: { gamingPerformance: { bgmi_fps: 60, freefire_fps: 120, cod_fps: 60 }, temperature: 42, batteryBackup: 7, antutuScore: 1150000 }, description: 'Stylish design meets smooth, reliable gaming performance.' },
+        ];
+
+        const photographyDevices = [
+            { id: 'photo1', name: 'Samsung Galaxy S24 Ultra', priceRange: '₹95,000 - ₹110,000', imageUrl: 'https://placehold.co/300x200/10B981/ffffff?text=S24+Ultra', specs: { mainMegapixel: 200, videoFormat: '8K @ 30fps (HDR10+)', stabilization: 'OIS (Sensor-Shift)', zoom: '100x Space Zoom', aiFeatures: 'Generative Edit, AI Scene Optimizer' }, description: 'Ultimate camera phone with a massive sensor and telephoto capabilities.' },
+            { id: 'photo2', name: 'Xiaomi 14 Ultra', priceRange: '₹80,000 - ₹95,000', imageUrl: 'https://placehold.co/300x200/059669/ffffff?text=Xiaomi+14+Ultra', specs: { mainMegapixel: 108, videoFormat: '4K @ 120fps (Dolby Vision)', stabilization: 'EIS + OIS (Hybrid)', zoom: '30x Hybrid Zoom', aiFeatures: 'HyperFocus Tracking, AI Portrait Video' }, description: 'Excellent hybrid zoom and high-frame-rate video for professionals.' },
+            { id: 'photo3', name: 'iPhone 15 Pro Max', priceRange: '₹1,20,000 - ₹1,40,000', imageUrl: 'https://placehold.co/300x200/047857/ffffff?text=iPhone+15+Pro', specs: { mainMegapixel: 48, videoFormat: 'ProRes 4K @ 60fps', stabilization: 'Sensor-Shift OIS', zoom: '5x Optical Zoom', aiFeatures: 'Deep Fusion, Photographic Styles' }, description: 'Premium choice for video creators with superior color depth.' },
+            { id: 'photo4', name: 'Google Pixel 8 Pro', priceRange: '₹70,000 - ₹85,000', imageUrl: 'https://placehold.co/300x200/00100B/ffffff?text=Pixel+8+Pro', specs: { mainMegapixel: 50, videoFormat: '4K @ 60fps (Video Boost)', stabilization: 'EIS + OIS', zoom: '8x Super Res Zoom', aiFeatures: 'Magic Eraser, Best Take, Video Boost' }, description: 'Best-in-class computational photography and AI editing tools.' },
+            { id: 'photo5', name: 'Vivo X100 Pro', priceRange: '₹75,000 - ₹90,000', imageUrl: 'https://placehold.co/300x200/024F3B/ffffff?text=Vivo+X100+Pro', specs: { mainMegapixel: 50, videoFormat: '8K @ 24fps & Cinematic 4K', stabilization: 'Gimbal Stabilization 3.0', zoom: '60x Digital Zoom', aiFeatures: 'Zeiss Cinematic Tones, AI Portrait' }, description: 'Superb stabilization and excellent portrait capture.' },
+            { id: 'photo6', name: 'Oppo Find X7 Ultra', priceRange: '₹70,000 - ₹85,000', imageUrl: 'https://placehold.co/300x200/003F2F/ffffff?text=Find+X7+Ultra', specs: { mainMegapixel: 64, videoFormat: '4K @ 60fps (10-bit color)', stabilization: 'OIS (Periscope)', zoom: '10x Optical Zoom', aiFeatures: 'Hasselblad Color Calibration' }, description: 'Focuses on color accuracy and long-range zoom.' },
+            { id: 'photo7', name: 'Honor Magic 6 Pro', priceRange: '₹80,000 - ₹95,000', imageUrl: 'https://placehold.co/300x200/002F23/ffffff?text=Magic+6+Pro', specs: { mainMegapixel: 180, videoFormat: '4K @ 60fps (Magic-Log)', stabilization: 'Falcon Eye OIS', zoom: '100x Digital Zoom', aiFeatures: 'AI Motion Sensing Capture' }, description: 'Incredible telephoto lens and AI-powered motion capture for sports.' },
+            { id: 'photo8', name: 'Huawei Pura 70 Ultra', priceRange: '₹90,000 - ₹1,05,000', imageUrl: 'https://placehold.co/300x200/001F17/ffffff?text=Pura+70+Ultra', specs: { mainMegapixel: 50, videoFormat: '4K @ 60fps (HDR)', stabilization: 'Retractable Lens OIS', zoom: '200x Digital Zoom', aiFeatures: 'Ultra Speed Snapshot' }, description: 'Revolutionary retractable lens and industry-leading zoom capabilities.' },
+            { id: 'photo9', name: 'Sony Xperia 1 V', priceRange: '₹1,00,000 - ₹1,15,000', imageUrl: 'https://placehold.co/300x200/00100B/ffffff?text=Xperia+1+V', specs: { mainMegapixel: 48, videoFormat: '4K HDR @ 120fps (CineAlta)', stabilization: 'FlawlessEye OIS', zoom: '15.6x Hybrid Zoom', aiFeatures: 'Real-time Eye AF (Human/Animal)' }, description: 'Aimed at pro photographers with DSLR-like controls.' },
+        ];
+
+        const allRounderDevices = [
+            { id: 'allrounder1', name: 'Samsung Galaxy S24', priceRange: '₹65,000 - ₹80,000', imageUrl: 'https://placehold.co/300x200/FFD700/000000?text=Samsung+S24', specs: { overallPerformanceScore: 90, cameraVersatilityScore: 85, batteryLifeHours: 7.5, displayQualityScore: 92, longTermScore: 88, longTermReason: 'Reliable performance and consistent software updates from Samsung.' }, description: 'A balanced flagship offering great performance, camera, and display.' },
+            { id: 'allrounder2', name: 'iPhone 15', priceRange: '₹70,000 - ₹90,000', imageUrl: 'https://placehold.co/300x200/C0C0C0/000000?text=iPhone+15', specs: { overallPerformanceScore: 92, cameraVersatilityScore: 80, batteryLifeHours: 7, displayQualityScore: 90, longTermScore: 95, longTermReason: 'Offers industry-leading software support and a highly optimized iOS UI.' }, description: 'Smooth performance and excellent ecosystem integration, reliable camera.' },
+            { id: 'allrounder3', name: 'Google Pixel 8', priceRange: '₹55,000 - ₹70,000', imageUrl: 'https://placehold.co/300x200/ADD8E6/000000?text=Google+Pixel+8', specs: { overallPerformanceScore: 88, cameraVersatilityScore: 90, batteryLifeHours: 6.8, displayQualityScore: 88, longTermScore: 92, longTermReason: 'Guaranteed long-term Android updates and a clean, fluid UI experience.' }, description: 'Known for its exceptional computational photography and clean software.' },
+            { id: 'allrounder4', name: 'OnePlus 12', priceRange: '₹65,000 - ₹80,000', imageUrl: 'https://placehold.co/300x200/DAA520/000000?text=OnePlus+12', specs: { overallPerformanceScore: 91, cameraVersatilityScore: 82, batteryLifeHours: 8.2, displayQualityScore: 93, longTermScore: 85, longTermReason: 'OxygenOS provides a fast and fluid UI, with good software update policy.' }, description: 'Blazing fast performance, great display, and rapid charging.' },
+            { id: 'allrounder5', name: 'Xiaomi 14', priceRange: '₹60,000 - ₹75,000', imageUrl: 'https://placehold.co/300x200/F0E68C/000000?text=Xiaomi+14', specs: { overallPerformanceScore: 89, cameraVersatilityScore: 87, batteryLifeHours: 7.2, displayQualityScore: 90, longTermScore: 80, longTermReason: 'Strong hardware, but software update consistency can vary.' }, description: 'Compact flagship with strong camera and performance.' },
+            { id: 'allrounder6', name: 'Realme GT 6', priceRange: '₹35,000 - ₹45,000', imageUrl: 'https://placehold.co/300x200/98FB98/000000?text=Realme+GT+6', specs: { overallPerformanceScore: 87, cameraVersatilityScore: 80, batteryLifeHours: 8, displayQualityScore: 91, longTermScore: 78, longTermReason: 'Flagship-level performance at a mid-range price point.' }, description: 'Excellent performance and a very bright display for its class.' },
+            { id: 'allrounder7', name: 'Motorola Edge 50 Pro', priceRange: '₹30,000 - ₹40,000', imageUrl: 'https://placehold.co/300x200/87CEEB/000000?text=Edge+50+Pro', specs: { overallPerformanceScore: 82, cameraVersatilityScore: 84, batteryLifeHours: 7, displayQualityScore: 89, longTermScore: 81, longTermReason: 'A near-stock Android UI ensures a clean, bloat-free experience.' }, description: 'Stylish design with a focus on display quality and clean software.' },
+            { id: 'allrounder8', name: 'Samsung Galaxy A55', priceRange: '₹28,000 - ₹38,000', imageUrl: 'https://placehold.co/300x200/DDA0DD/000000?text=Samsung+A55', specs: { overallPerformanceScore: 78, cameraVersatilityScore: 75, batteryLifeHours: 9, displayQualityScore: 85, longTermScore: 84, longTermReason: 'Great battery life and good software support for a mid-ranger.' }, description: 'Premium build quality and excellent battery life for its price.' },
+            { id: 'allrounder9', name: 'Nothing Phone (2a)', priceRange: '₹22,000 - ₹30,000', imageUrl: 'https://placehold.co/300x200/F08080/000000?text=Nothing+(2a)', specs: { overallPerformanceScore: 75, cameraVersatilityScore: 78, batteryLifeHours: 8.5, displayQualityScore: 88, longTermScore: 79, longTermReason: 'Unique design and a clean OS, a solid mid-range choice.' }, description: 'Distinctive design and a solid mid-range performer with a clean UI.' },
+        ];
+
+        const priceFilters = [
+            { label: 'All Prices', min: 0, max: Infinity },
+            { label: 'Under ₹40,000', min: 0, max: 40000 },
+            { label: '₹40,000 - ₹60,000', min: 40000, max: 60000 },
+            { label: '₹60,000 - ₹80,000', min: 60000, max: 80000 },
+            { label: '₹80,000 and Above', min: 80000, max: Infinity },
+        ];
+
+        // ==================== HELPERS ====================
+
+        function parsePriceRange(rangeString) {
+            const cleanedString = rangeString.replace(/[₹,]/g, '').replace('Under ', '').replace(' and Above', '');
+            const parts = cleanedString.split(' - ');
+            let min = 0, max = Infinity;
+            if (parts.length === 1) {
+                if (rangeString.includes('and Above')) min = parseFloat(parts[0].trim());
+                else if (rangeString.includes('Under')) max = parseFloat(parts[0].trim());
+            } else if (parts.length === 2) {
+                min = parseFloat(parts[0].trim());
+                max = parseFloat(parts[1].trim());
+            }
+            return { min, max };
+        }
+
+        function renderDeviceCard(device, category) {
+            let specHtml = '', color = '';
+            switch (category) {
+                case 'gaming':
+                    const gp = device.specs.gamingPerformance;
+                    specHtml = `
+                        <div class="grid grid-cols-3 gap-1 text-center mb-2 border-b border-purple-200 pb-2">
+                            <p class="text-xs font-medium">BGMI<br><span class="text-purple-600 font-bold">${gp.bgmi_fps}fps</span></p>
+                            <p class="text-xs font-medium">FreeFire<br><span class="text-purple-600 font-bold">${gp.freefire_fps}fps</span></p>
+                            <p class="text-xs font-medium">CoD<br><span class="text-purple-600 font-bold">${gp.cod_fps}fps</span></p>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1 text-center text-xs font-medium">
+                            <p>Antutu<br><span class="text-purple-600 font-bold">${(device.specs.antutuScore / 1000000).toFixed(1)}M</span></p>
+                            <p>Battery<br><span class="text-purple-600 font-bold">${device.specs.batteryBackup}hrs</span></p>
+                            <p>Temp<br><span class="text-purple-600 font-bold">${device.specs.temperature}°C</span></p>
+                        </div>`;
+                    color = 'bg-purple-100 border-purple-300';
+                    break;
+                case 'photography':
+                    specHtml = `<p class="text-sm font-medium">Main MP: <span class="text-green-600">${device.specs.mainMegapixel}MP</span></p><p class="text-sm font-medium">Video Max: <span class="text-green-600">${device.specs.videoFormat.split(' ')[0]}</span></p><p class="text-sm font-medium">Zoom: <span class="text-green-600">${device.specs.zoom.split(' ')[0]}</span></p>`;
+                    color = 'bg-green-100 border-green-300';
+                    break;
+                case 'allRounder':
+                    specHtml = `<p class="text-sm font-medium">Overall: <span class="text-yellow-600">${device.specs.overallPerformanceScore}%</span></p><p class="text-sm font-medium">Battery (Hrs): <span class="text-yellow-600">${device.specs.batteryLifeHours}</span></p><p class="text-sm font-medium">Long Term: <span class="text-yellow-600">${device.specs.longTermScore}%</span></p>`;
+                    color = 'bg-yellow-100 border-yellow-300';
+                    break;
+            }
+            return `<div class="device-card bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden transform transition duration-300 hover:scale-[1.02] animate-fade-in-up"><img src="${device.imageUrl}" alt="${device.name}" class="w-full h-40 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/300x200/cccccc/000000?text=Image+Not+Found'"><div class="p-4"><h3 class="text-xl font-bold mb-2">${device.name}</h3><p class="text-lg font-semibold text-gray-700 mb-3">${device.priceRange}</p><div class="p-3 rounded-lg ${color} border mb-3">${specHtml}</div><p class="text-sm text-gray-600">${device.description}</p></div></div>`;
+        }
+
+        function populatePriceFilters(filterId) {
+            const selectElement = document.getElementById(filterId);
+            if (!selectElement) return;
+            selectElement.innerHTML = priceFilters.map(filter => `<option value="${filter.label}">${filter.label}</option>`).join('');
+        }
+
+        function renderDevices(category) {
+            const allDevices = { gaming: gamingDevices, photography: photographyDevices, allRounder: allRounderDevices }[category];
+            const capCategory = category.charAt(0).toUpperCase() + category.slice(1);
+            const priceFilterSelect = document.getElementById(`priceFilter${capCategory}`);
+            let filteredDevices = allDevices;
+
+            if (priceFilterSelect && priceFilterSelect.value !== 'All Prices') {
+                const selectedRange = priceFilters.find(f => f.label === priceFilterSelect.value);
+                if (selectedRange) {
+                    const { min, max } = parsePriceRange(selectedRange.label);
+                    filteredDevices = allDevices.filter(device => {
+                        const { min: dMin, max: dMax } = parsePriceRange(device.priceRange);
+                        return (dMin < max) && (dMax > min);
+                    });
+                }
+            }
+
+            document.getElementById(`${category}DeviceList`).innerHTML = filteredDevices.length > 0
+                ? filteredDevices.map(device => renderDeviceCard(device, category)).join('')
+                : '<p class="col-span-full text-center text-gray-500 text-lg py-8">No devices found in this price range.</p>';
+
+            const numComparisonsSelect = document.getElementById(`numComparisons${capCategory}`);
+            const dropdownsContainer = document.getElementById(`${category}ComparisonDropdowns`);
+
+            if (numComparisonsSelect && dropdownsContainer) {
+                const num = parseInt(numComparisonsSelect.value);
+                const colorMap = { gaming: 'blue', photography: 'green', allRounder: 'yellow' };
+                dropdownsContainer.innerHTML = '';
+                for (let i = 0; i < num; i++) {
+                    const select = document.createElement('select');
+                    select.id = `${category}CompareDevice${i + 1}`;
+                    select.className = `device-select p-3 border border-gray-300 rounded-md focus:ring-2 focus:border-transparent w-full shadow-md focus:ring-${colorMap[category]}-500`;
+                    select.innerHTML = filteredDevices.map(device => `<option value="${device.id}">${device.name}</option>`).join('');
+                    if (i < filteredDevices.length) {
+                        select.value = filteredDevices[i].id;
+                    }
+                    dropdownsContainer.appendChild(select);
+                }
+                updateComparisonDropdowns(category);
+            }
+
+            document.getElementById(`${category}ComparisonResults`).innerHTML = '';
+            document.getElementById(`${category}Suggestion`).classList.add('hidden');
+        }
+
+        function updateComparisonDropdowns(category) {
+            const dropdowns = document.querySelectorAll(`#${category}ComparisonDropdowns .device-select`);
+            const selectedValues = Array.from(dropdowns).map(d => d.value);
+            dropdowns.forEach(dropdown => {
+                const currentSelection = dropdown.value;
+                dropdown.querySelectorAll('option').forEach(option => {
+                    option.disabled = selectedValues.includes(option.value) && option.value !== currentSelection;
+                });
+            });
+        }
+
+        function generateSuggestionText(devicesToCompare, category) {
+            if (devicesToCompare.length < 2) return '';
+
+            const findBest = (spec, higherIsBetter = true, nestedKey = null) => {
+                return devicesToCompare.reduce((best, current) => {
+                    const bestVal = nestedKey ? best.specs[nestedKey][spec] : best.specs[spec];
+                    const currentVal = nestedKey ? current.specs[nestedKey][spec] : current.specs[spec];
+                    return (higherIsBetter ? currentVal > bestVal : currentVal < bestVal) ? current : best;
+                });
+            };
+
+            let suggestion = '<strong>Smart Suggestion:</strong>\n';
+
+            if (category === 'gaming') {
+                const bestBgmi = findBest('bgmi_fps', true, 'gamingPerformance');
+                const bestBattery = findBest('batteryBackup');
+                const bestCooling = findBest('temperature', false);
+                suggestion += `For the best BGMI experience, the <strong>${bestBgmi.name}</strong> leads with the highest FPS. `;
+                if (bestBattery.id !== bestBgmi.id) {
+                    suggestion += `If long gaming sessions are your priority, the <strong>${bestBattery.name}</strong> offers superior battery life. `;
+                }
+                suggestion += `For thermal management, the <strong>${bestCooling.name}</strong> runs the coolest.`;
+            } else if (category === 'photography') {
+                const bestDetail = findBest('mainMegapixel');
+                const proVideoDevice = devicesToCompare.find(d => d.specs.videoFormat.includes('8K') || d.specs.videoFormat.includes('ProRes'));
+                suggestion += `For maximum photo detail, the <strong>${bestDetail.name}</strong> stands out with its ${bestDetail.specs.mainMegapixel}MP sensor. `;
+                if (proVideoDevice) suggestion += `If professional video is key, consider the <strong>${proVideoDevice.name}</strong>. `;
+            } else if (category === 'allRounder') {
+                const bestOverall = findBest('overallPerformanceScore');
+                const bestLongTerm = findBest('longTermScore');
+                suggestion += `The <strong>${bestOverall.name}</strong> is the strongest overall performer. `;
+                suggestion += `For the best long-term value with reliable software support, the <strong>${bestLongTerm.name}</strong> is the top recommendation.`;
+            }
+
+            return suggestion;
+        }
+
+        function renderComparisonTable(category) {
+            const allDevices = { gaming: gamingDevices, photography: photographyDevices, allRounder: allRounderDevices }[category];
+            const selectedDeviceIds = Array.from(document.querySelectorAll(`#${category}ComparisonDropdowns .device-select`)).map(s => s.value);
+            const devicesToCompare = allDevices.filter(d => selectedDeviceIds.includes(d.id) && selectedDeviceIds.indexOf(d.id) === selectedDeviceIds.lastIndexOf(d.id));
+
+            if (devicesToCompare.length < 2) return '<p class="text-center font-semibold text-red-600">Please select at least two different devices to compare.</p>';
+
+            const highlightClass = { gaming: 'bg-blue-100 font-bold text-blue-800', photography: 'bg-green-100 font-bold text-green-800', allRounder: 'bg-yellow-100 font-bold text-yellow-800' }[category];
+
+            const bestValues = {};
+            const comparisonSpecs = {
+                gaming: [
+                    { key: 'priceRange', label: 'Price Range' },
+                    { key: 'bgmi_fps', nestedKey: 'gamingPerformance', label: 'BGMI FPS', unit: 'fps', higherIsBetter: true },
+                    { key: 'freefire_fps', nestedKey: 'gamingPerformance', label: 'Free Fire FPS', unit: 'fps', higherIsBetter: true },
+                    { key: 'cod_fps', nestedKey: 'gamingPerformance', label: 'Call of Duty FPS', unit: 'fps', higherIsBetter: true },
+                    { key: 'batteryBackup', label: 'Battery (hrs)', unit: '', higherIsBetter: true },
+                    { key: 'temperature', label: 'Temperature (°C)', unit: '', higherIsBetter: false },
+                    { key: 'antutuScore', label: 'Antutu Score', higherIsBetter: true }
+                ],
+                photography: [
+                    { key: 'priceRange', label: 'Price Range' },
+                    { key: 'mainMegapixel', label: 'Main MP', unit: 'MP', higherIsBetter: true },
+                    { key: 'videoFormat', label: 'Video Format' },
+                    { key: 'stabilization', label: 'Stabilization' },
+                    { key: 'zoom', label: 'Max Zoom' },
+                    { key: 'aiFeatures', label: 'Key AI Features' }
+                ],
+                allRounder: [
+                    { key: 'priceRange', label: 'Price Range' },
+                    { key: 'overallPerformanceScore', label: 'Overall Score', unit: '%', higherIsBetter: true },
+                    { key: 'cameraVersatilityScore', label: 'Camera Score', unit: '%', higherIsBetter: true },
+                    { key: 'batteryLifeHours', label: 'Battery Life', unit: 'hrs', higherIsBetter: true },
+                    { key: 'displayQualityScore', label: 'Display Score', unit: '%', higherIsBetter: true },
+                    { key: 'longTermScore', label: 'Long Term Score', unit: '%', higherIsBetter: true }
+                ]
+            }[category];
+
+            comparisonSpecs.forEach(spec => {
+                if (spec.higherIsBetter === undefined) return;
+                const values = devicesToCompare.map(d => parseFloat(spec.nestedKey ? d.specs[spec.nestedKey][spec.key] : d.specs[spec.key])).filter(v => !isNaN(v));
+                if (values.length > 0) bestValues[spec.key] = spec.higherIsBetter ? Math.max(...values) : Math.min(...values);
+            });
+
+            let headers = `<th>Feature</th>`;
+            devicesToCompare.forEach(device => { headers += `<th class="font-bold text-center">${device.name}</th>`; });
+
+            let rows = '';
+            comparisonSpecs.forEach(rowInfo => {
+                rows += `<tr><td class="font-semibold">${rowInfo.label}</td>`;
+                devicesToCompare.forEach(device => {
+                    let value = rowInfo.nestedKey ? device.specs[rowInfo.nestedKey][rowInfo.key] : (rowInfo.key === 'priceRange' ? device.priceRange : device.specs[rowInfo.key]);
+                    let cellClass = 'text-center';
+                    const specValue = rowInfo.nestedKey ? device.specs[rowInfo.nestedKey][rowInfo.key] : device.specs[rowInfo.key];
+                    if (bestValues[rowInfo.key] !== undefined && specValue === bestValues[rowInfo.key]) {
+                        cellClass += ` ${highlightClass}`;
+                    }
+                    if (rowInfo.key === 'antutuScore') value = `${(value / 1000000).toFixed(1)}M`;
+                    else if (rowInfo.unit) value += `${rowInfo.unit}`;
+                    rows += `<td class="${cellClass}">${value}</td>`;
+                });
+                rows += `</tr>`;
+            });
+
+            if (category === 'allRounder') {
+                rows += `<tr><td class="font-semibold">Long Term Reason</td>`;
+                devicesToCompare.forEach(device => { rows += `<td>${device.specs.longTermReason}</td>`; });
+                rows += `</tr>`;
+            }
+
+            return `<div class="overflow-x-auto rounded-lg border border-gray-300 shadow-xl animate-fade-in-up"><table class="comparison-table"><thead><tr class="bg-gray-200">${headers}</tr></thead><tbody>${rows}</tbody></table></div>`;
+        }
+
+        // ==================== NAVIGATION ====================
+
+        function showCategory(category) {
+            document.querySelectorAll('.category-section').forEach(section => section.classList.add('hidden'));
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('bg-white', 'text-purple-700', 'shadow-md');
+                btn.classList.add('text-white', 'hover:bg-purple-800');
+            });
+
+            const capCategory = category.charAt(0).toUpperCase() + category.slice(1);
+            const categoryElement = document.getElementById(`${category}Category`);
+            const buttonElement = document.getElementById(`${category}Btn`);
+
+            if (categoryElement) {
+                categoryElement.classList.remove('hidden');
+                if (buttonElement) {
+                    buttonElement.classList.remove('text-white', 'hover:bg-purple-800');
+                    buttonElement.classList.add('bg-white', 'text-purple-700', 'shadow-md');
+                }
+                populatePriceFilters(`priceFilter${capCategory}`);
+                renderDevices(category);
+            }
+        }
+
+        // ==================== EVENT LISTENERS ====================
+
+        function setupEventListeners(category) {
+            const capCategory = category.charAt(0).toUpperCase() + category.slice(1);
+
+            const numEl = document.getElementById(`numComparisons${capCategory}`);
+            if (numEl) numEl.addEventListener('change', () => renderDevices(category));
+
+            const priceEl = document.getElementById(`priceFilter${capCategory}`);
+            if (priceEl) priceEl.addEventListener('change', () => renderDevices(category));
+
+            const dropdownContainer = document.getElementById(`${category}ComparisonDropdowns`);
+            if (dropdownContainer) dropdownContainer.addEventListener('change', () => updateComparisonDropdowns(category));
+
+            const compareBtn = document.getElementById(`compare${capCategory}Btn`);
+            if (compareBtn) {
+                compareBtn.addEventListener('click', () => {
+                    const resultsDiv = document.getElementById(`${category}ComparisonResults`);
+                    const suggestionDiv = document.getElementById(`${category}Suggestion`);
+                    resultsDiv.innerHTML = renderComparisonTable(category);
+
+                    const dropdowns = document.querySelectorAll(`#${category}ComparisonDropdowns .device-select`);
+                    const selectedIds = Array.from(dropdowns).map(d => d.value);
+                    const uniqueIds = [...new Set(selectedIds)];
+
+                    if (uniqueIds.length < 2) {
+                        suggestionDiv.classList.add('hidden');
+                        return;
+                    }
+
+                    const allDevices = { gaming: gamingDevices, photography: photographyDevices, allRounder: allRounderDevices }[category];
+                    const devicesToCompare = allDevices.filter(d => uniqueIds.includes(d.id));
+
+                    if (devicesToCompare.length > 1) {
+                        suggestionDiv.innerHTML = generateSuggestionText(devicesToCompare, category);
+                        suggestionDiv.classList.remove('hidden');
+                    } else {
+                        suggestionDiv.classList.add('hidden');
+                    }
+                });
+            }
+        }
+
+        // ==================== INIT ====================
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.category-btn').forEach(button => {
+                button.addEventListener('click', (e) => showCategory(e.target.dataset.category));
+            });
+            ['gaming', 'photography', 'allRounder'].forEach(setupEventListeners);
+            showCategory('gaming');
+        });
+    </script>
+</body>
+</html>
